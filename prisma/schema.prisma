@@ -1,13 +1,73 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Franchise {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  description      String
+  tmdbCollectionId Int?
+  watchOrderGuide  String
+  heroImageUrl     String?
+  featured         Boolean  @default(false)
+  movies           Movie[]
+  trivia           Trivia[]
+}
+
+model Movie {
+  id             String      @id @default(cuid())
+  tmdbId         Int         @unique
+  franchiseId    String
+  franchise      Franchise   @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
+  sortOrder      Int
+  watchOrderNote String?
+  trivia         Trivia[]
+  userMovies     UserMovie[]
+}
+
+model Trivia {
+  id          String     @id @default(cuid())
+  content     String
+  source      String?
+  movieId     String?
+  movie       Movie?     @relation(fields: [movieId], references: [id])
+  franchiseId String?
+  franchise   Franchise? @relation(fields: [franchiseId], references: [id])
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  name         String
+  passwordHash String
+  avatarUrl    String?
+  role         Role        @default(USER)
+  inviteCode   String?     @unique
+  createdAt    DateTime    @default(now())
+  userMovies   UserMovie[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model UserMovie {
+  userId    String
+  movieId   String
+  user      User      @relation(fields: [userId], references: [id])
+  movie     Movie     @relation(fields: [movieId], references: [id])
+  watched   Boolean   @default(false)
+  watchlist Boolean   @default(false)
+  rating    Int?
+  review    String?
+  watchedAt DateTime?
+
+  @@id([userId, movieId])
 }
