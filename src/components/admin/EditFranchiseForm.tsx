@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Franchise {
   id: string
@@ -10,6 +11,7 @@ interface Franchise {
   watchOrderGuide: string
   heroImageUrl: string | null
   featured: boolean
+  tmdbCollectionId: number | null
 }
 
 export default function EditFranchiseForm({ franchise }: { franchise: Franchise }) {
@@ -23,6 +25,17 @@ export default function EditFranchiseForm({ franchise }: { franchise: Franchise 
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [fetchingImage, setFetchingImage] = useState(false)
+
+  async function fetchTmdbImage() {
+    setFetchingImage(true)
+    const res = await fetch(`/api/admin/franchises/${franchise.id}/fetch-image`, { method: 'POST' })
+    const data = await res.json()
+    if (data.heroImageUrl) {
+      setForm((f) => ({ ...f, heroImageUrl: data.heroImageUrl }))
+    }
+    setFetchingImage(false)
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault()
@@ -40,19 +53,49 @@ export default function EditFranchiseForm({ franchise }: { franchise: Franchise 
 
   return (
     <form onSubmit={save} className="space-y-4">
-      {[
-        ['name', 'Name'],
-        ['heroImageUrl', 'Hero Image URL (optional)'],
-      ].map(([key, label]) => (
-        <div key={key}>
-          <label className="block text-xs text-cinema-muted mb-1.5 uppercase tracking-wider">{label}</label>
+      <div>
+        <label className="block text-xs text-cinema-muted mb-1.5 uppercase tracking-wider">Name</label>
+        <input
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          className="w-full bg-black border border-cinema-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-cinema-red"
+        />
+      </div>
+
+      {/* Hero image with preview */}
+      <div>
+        <label className="block text-xs text-cinema-muted mb-1.5 uppercase tracking-wider">Hero Image</label>
+        <div className="flex gap-2 mb-2">
           <input
-            value={form[key as keyof typeof form] as string}
-            onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-            className="w-full bg-black border border-cinema-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-cinema-red"
+            value={form.heroImageUrl}
+            onChange={(e) => setForm({ ...form, heroImageUrl: e.target.value })}
+            placeholder="https://image.tmdb.org/…"
+            className="flex-1 bg-black border border-cinema-border rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-cinema-red"
           />
+          {franchise.tmdbCollectionId && (
+            <button
+              type="button"
+              onClick={fetchTmdbImage}
+              disabled={fetchingImage}
+              className="bg-cinema-surface border border-cinema-border text-cinema-muted text-xs font-bold px-3 py-2 rounded hover:border-cinema-muted hover:text-white transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {fetchingImage ? '…' : '↓ From TMDB'}
+            </button>
+          )}
         </div>
-      ))}
+        {form.heroImageUrl && (
+          <div className="relative h-24 rounded overflow-hidden border border-cinema-border">
+            <Image
+              src={form.heroImageUrl}
+              alt="Hero preview"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        )}
+      </div>
+
       <div>
         <label className="block text-xs text-cinema-muted mb-1.5 uppercase tracking-wider">Description</label>
         <textarea
@@ -62,6 +105,7 @@ export default function EditFranchiseForm({ franchise }: { franchise: Franchise 
           className="w-full bg-black border border-cinema-border rounded px-3 py-2 text-white text-sm resize-none focus:outline-none focus:border-cinema-red"
         />
       </div>
+
       <div>
         <label className="block text-xs text-cinema-muted mb-1.5 uppercase tracking-wider">Watch Order Guide</label>
         <textarea
@@ -71,6 +115,7 @@ export default function EditFranchiseForm({ franchise }: { franchise: Franchise 
           className="w-full bg-black border border-cinema-border rounded px-3 py-2 text-white text-sm resize-none focus:outline-none focus:border-cinema-red"
         />
       </div>
+
       <div className="flex items-center gap-3">
         <input
           type="checkbox"
@@ -79,8 +124,11 @@ export default function EditFranchiseForm({ franchise }: { franchise: Franchise 
           onChange={(e) => setForm({ ...form, featured: e.target.checked })}
           className="rounded"
         />
-        <label htmlFor="featured" className="text-cinema-muted text-sm">Featured franchise (hero on home page)</label>
+        <label htmlFor="featured" className="text-cinema-muted text-sm">
+          Featured franchise (hero on home page)
+        </label>
       </div>
+
       <button
         type="submit"
         disabled={saving}
