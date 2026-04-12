@@ -114,6 +114,11 @@ export default async function FranchisePage({ params }: { params: { slug: string
                     WATCHLIST
                   </span>
                 )}
+                {!movie.mainStoryline && (
+                  <span className="bg-cinema-border text-cinema-dim text-[10px] font-bold px-2 py-0.5 rounded">
+                    SIDE STORY
+                  </span>
+                )}
                 <StreamingBadges providers={providers} />
               </div>
             </Link>

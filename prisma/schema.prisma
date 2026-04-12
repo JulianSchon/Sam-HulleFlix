@@ -26,6 +26,7 @@ model Movie {
   franchiseId    String
   franchise      Franchise   @relation(fields: [franchiseId], references: [id], onDelete: Cascade)
   sortOrder      Int
+  mainStoryline  Boolean     @default(true)
   watchOrderNote String?
   trivia         Trivia[]
   userMovies     UserMovie[]

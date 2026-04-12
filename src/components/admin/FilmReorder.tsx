@@ -23,6 +23,7 @@ interface Film {
   id: string
   tmdbId: number
   sortOrder: number
+  mainStoryline: boolean
   title?: string
 }
 
@@ -36,9 +37,11 @@ interface TmdbSearchResult {
 function SortableItem({
   film,
   onDelete,
+  onToggleMainStoryline,
 }: {
   film: Film
   onDelete: (id: string) => void
+  onToggleMainStoryline: (id: string, value: boolean) => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: film.id })
 
@@ -56,6 +59,15 @@ function SortableItem({
         ⠿
       </span>
       <span className="text-cinema-muted text-sm flex-1">{film.title ?? `TMDB ${film.tmdbId}`}</span>
+      <label className="flex items-center gap-1.5 flex-shrink-0 cursor-pointer" title="Main storyline">
+        <input
+          type="checkbox"
+          checked={film.mainStoryline}
+          onChange={(e) => onToggleMainStoryline(film.id, e.target.checked)}
+          className="accent-cinema-gold w-3.5 h-3.5"
+        />
+        <span className="text-cinema-dim text-xs">Main</span>
+      </label>
       <button
         onClick={() => onDelete(film.id)}
         className="text-cinema-red text-xs hover:opacity-70 transition-opacity flex-shrink-0 px-1"
@@ -83,6 +95,7 @@ export default function FilmReorder({
   const [searchResults, setSearchResults] = useState<TmdbSearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [adding, setAdding] = useState<number | null>(null)
+  const [addingAll, setAddingAll] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -117,6 +130,15 @@ export default function FilmReorder({
     setFilms((prev) => prev.filter((f) => f.id !== id))
   }
 
+  async function toggleMainStoryline(id: string, value: boolean) {
+    setFilms((prev) => prev.map((f) => f.id === id ? { ...f, mainStoryline: value } : f))
+    await fetch(`/api/admin/movies/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mainStoryline: value }),
+    })
+  }
+
   async function searchTmdb() {
     if (!searchQuery.trim()) return
     setSearching(true)
@@ -136,10 +158,33 @@ export default function FilmReorder({
       body: JSON.stringify({ tmdbId: result.id }),
     })
     const newMovie = await res.json()
-    setFilms((prev) => [...prev, { id: newMovie.id, tmdbId: result.id, sortOrder: prev.length, title: result.title }])
+    setFilms((prev) => [...prev, { id: newMovie.id, tmdbId: result.id, sortOrder: prev.length, mainStoryline: true, title: result.title }])
     setSearchResults([])
     setSearchQuery('')
     setAdding(null)
+  }
+
+  async function addAllFilms() {
+    setAddingAll(true)
+    const added: Film[] = []
+    for (const result of searchResults) {
+      const res = await fetch(`/api/admin/franchises/${franchiseId}/movies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tmdbId: result.id }),
+      })
+      if (res.ok) {
+        const newMovie = await res.json()
+        added.push({ id: newMovie.id, tmdbId: result.id, sortOrder: 0, mainStoryline: true, title: result.title })
+      }
+    }
+    setFilms((prev) => {
+      const base = prev.length
+      return [...prev, ...added.map((f, i) => ({ ...f, sortOrder: base + i }))]
+    })
+    setSearchResults([])
+    setSearchQuery('')
+    setAddingAll(false)
   }
 
   return (
@@ -149,7 +194,7 @@ export default function FilmReorder({
         <SortableContext items={films.map((f) => f.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-2">
             {films.map((film) => (
-              <SortableItem key={film.id} film={film} onDelete={deleteFilm} />
+              <SortableItem key={film.id} film={film} onDelete={deleteFilm} onToggleMainStoryline={toggleMainStoryline} />
             ))}
           </div>
         </SortableContext>
@@ -186,25 +231,38 @@ export default function FilmReorder({
         </div>
 
         {searchResults.length > 0 && (
-          <div className="space-y-1 max-h-60 overflow-y-auto">
-            {searchResults.map((r) => (
-              <div
-                key={r.id}
-                className="flex items-center justify-between bg-cinema-surface border border-cinema-border rounded px-3 py-2"
-              >
-                <div>
-                  <span className="text-white text-sm">{r.title}</span>
-                  <span className="text-cinema-dim text-xs ml-2">{r.release_date?.slice(0, 4)}</span>
-                </div>
+          <div className="space-y-1">
+            {searchResults.length > 1 && (
+              <div className="flex justify-end mb-1">
                 <button
-                  onClick={() => addFilm(r)}
-                  disabled={adding === r.id}
-                  className="text-cinema-gold text-xs font-bold hover:opacity-70 disabled:opacity-50 ml-4"
+                  onClick={addAllFilms}
+                  disabled={addingAll}
+                  className="bg-cinema-gold text-black text-xs font-bold px-3 py-1.5 rounded hover:opacity-80 disabled:opacity-50 transition-opacity"
                 >
-                  {adding === r.id ? '…' : '+ Add'}
+                  {addingAll ? 'Adding…' : `+ Add All (${searchResults.length})`}
                 </button>
               </div>
-            ))}
+            )}
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {searchResults.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between bg-cinema-surface border border-cinema-border rounded px-3 py-2"
+                >
+                  <div>
+                    <span className="text-white text-sm">{r.title}</span>
+                    <span className="text-cinema-dim text-xs ml-2">{r.release_date?.slice(0, 4)}</span>
+                  </div>
+                  <button
+                    onClick={() => addFilm(r)}
+                    disabled={adding === r.id || addingAll}
+                    className="text-cinema-gold text-xs font-bold hover:opacity-70 disabled:opacity-50 ml-4"
+                  >
+                    {adding === r.id ? '…' : '+ Add'}
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
