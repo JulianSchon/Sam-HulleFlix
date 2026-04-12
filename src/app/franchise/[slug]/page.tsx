@@ -6,6 +6,8 @@ import { getTmdbMovie, getTmdbProviders, tmdbPosterUrl } from '@/lib/tmdb'
 import Image from 'next/image'
 import Link from 'next/link'
 import StreamingBadges from '@/components/StreamingBadges'
+import FranchiseComments from '@/components/FranchiseComments'
+import UpdateRequestButton from '@/components/UpdateRequestButton'
 
 export default async function FranchisePage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions)
@@ -15,6 +17,10 @@ export default async function FranchisePage({ params }: { params: { slug: string
     include: {
       movies: { orderBy: { sortOrder: 'asc' } },
       trivia: true,
+      comments: {
+        orderBy: { createdAt: 'desc' },
+        include: { user: { select: { name: true } } },
+      },
     },
   })
 
@@ -128,7 +134,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
 
       {/* Trivia */}
       {franchise.trivia.length > 0 && (
-        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-5">
+        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-5 mb-8">
           <h2 className="text-cinema-gold text-xs font-bold tracking-widest uppercase mb-4">
             Franchise Trivia
           </h2>
@@ -142,6 +148,26 @@ export default async function FranchisePage({ params }: { params: { slug: string
               </p>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Comments */}
+      <div className="bg-cinema-surface border border-cinema-border rounded-lg p-5 mb-4">
+        <FranchiseComments
+          franchiseId={franchise.id}
+          initialComments={franchise.comments.map((c) => ({
+            ...c,
+            createdAt: c.createdAt.toISOString(),
+          }))}
+          currentUserId={session?.user?.id ?? null}
+          isAdmin={session?.user?.role === 'ADMIN'}
+        />
+      </div>
+
+      {/* Update request */}
+      {session && (
+        <div className="flex justify-end">
+          <UpdateRequestButton franchiseId={franchise.id} />
         </div>
       )}
     </div>

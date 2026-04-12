@@ -17,6 +17,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/users" className="text-cinema-muted hover:text-white text-sm transition-colors">
           Users
         </Link>
+        <Link href="/admin/update-requests" className="text-cinema-muted hover:text-white text-sm transition-colors">
+          Update Requests
+        </Link>
         <Link href="/" className="text-cinema-dim hover:text-cinema-muted text-sm transition-colors ml-auto">
           ← Site
         </Link>
