@@ -11,12 +11,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link
           href="/"
-          className="text-cinema-red font-black tracking-[3px] text-lg hover:opacity-80 transition-opacity"
+          className="text-cinema-red font-black tracking-[2px] md:tracking-[3px] text-base md:text-lg hover:opacity-80 transition-opacity"
         >
           SAM-HULLE-FLIX
         </Link>
 
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-3 md:gap-6 text-sm">
           <Link href="/" className="text-cinema-muted hover:text-white transition-colors">
             Browse
           </Link>

@@ -73,7 +73,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
             <Link
               key={movie.id}
               href={`/movie/${movie.id}`}
-              className="flex items-center gap-4 bg-cinema-surface border border-cinema-border rounded-lg p-3 hover:border-cinema-muted transition-colors"
+              className="flex items-center gap-3 md:gap-4 bg-cinema-surface border border-cinema-border rounded-lg p-3 hover:border-cinema-muted transition-colors"
             >
               <span className="text-cinema-dim text-xs w-4 flex-shrink-0 text-right">{i + 1}</span>
               <div className="relative w-10 h-14 flex-shrink-0 rounded overflow-hidden bg-cinema-border">
@@ -103,7 +103,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
                   <p className="text-cinema-dim text-xs mt-1 italic">{movie.watchOrderNote}</p>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <div className="flex flex-col items-end gap-1.5 flex-shrink-0 min-w-[60px]">
                 {watched && (
                   <span className="bg-green-950/50 border border-green-900/50 text-green-500 text-[10px] font-bold px-2 py-0.5 rounded">
                     SEEN

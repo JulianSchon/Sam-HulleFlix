@@ -62,9 +62,9 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
         </div>
       )}
 
-      <div className="grid md:grid-cols-[200px_1fr] gap-8">
+      <div className="grid md:grid-cols-[200px_1fr] gap-6 md:gap-8">
         {/* Poster */}
-        <div>
+        <div className="max-w-[200px] mx-auto w-full md:max-w-none md:mx-0">
           <div className="relative w-full aspect-[2/3] rounded-lg overflow-hidden bg-cinema-surface mb-4">
             {tmdb?.poster_path && (
               <Image

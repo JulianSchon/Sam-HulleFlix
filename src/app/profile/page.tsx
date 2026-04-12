@@ -61,20 +61,20 @@ export default async function ProfilePage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-4 text-center">
-          <p className="text-cinema-red font-black text-3xl">{watched.length}</p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-10">
+        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-3 md:p-4 text-center">
+          <p className="text-cinema-red font-black text-2xl md:text-3xl">{watched.length}</p>
           <p className="text-cinema-muted text-xs mt-1 uppercase tracking-wider">Films Seen</p>
         </div>
-        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-4 text-center">
-          <p className="text-cinema-gold font-black text-3xl">{franchisesSeen.size}</p>
+        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-3 md:p-4 text-center">
+          <p className="text-cinema-gold font-black text-2xl md:text-3xl">{franchisesSeen.size}</p>
           <p className="text-cinema-muted text-xs mt-1 uppercase tracking-wider">Franchises</p>
         </div>
-        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-4 text-center">
-          <p className="text-cinema-blue font-black text-3xl">{watchlist.length}</p>
+        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-3 md:p-4 text-center">
+          <p className="text-cinema-blue font-black text-2xl md:text-3xl">{watchlist.length}</p>
           <p className="text-cinema-muted text-xs mt-1 uppercase tracking-wider">Watchlist</p>
         </div>
-        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-4 text-center">
+        <div className="bg-cinema-surface border border-cinema-border rounded-lg p-3 md:p-4 text-center">
           {favFranchise ? (
             <>
               <p className="text-white font-black text-sm leading-tight">{favFranchise.name}</p>

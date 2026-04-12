@@ -66,13 +66,13 @@ export default function HeroCarousel({ franchises }: { franchises: Franchise[] }
 
       {/* Content */}
       <div
-        className="relative px-8 py-10 transition-opacity duration-400"
+        className="relative px-4 py-6 md:px-8 md:py-10 transition-opacity duration-400"
         style={{ opacity: fading ? 0 : 1 }}
       >
         <p className="text-cinema-muted text-xs tracking-widest uppercase mb-2">Featured Franchise</p>
-        <h1 className="text-white font-black text-4xl tracking-wide mb-2">{f.name}</h1>
+        <h1 className="text-white font-black text-2xl md:text-4xl tracking-wide mb-2">{f.name}</h1>
         <p className="text-cinema-muted text-sm mb-1">{f.movieCount} films</p>
-        <p className="text-cinema-muted text-sm max-w-lg mb-6 line-clamp-2">{f.description}</p>
+        <p className="text-cinema-muted text-sm max-w-lg mb-4 md:mb-6 line-clamp-2">{f.description}</p>
         <div className="flex items-center gap-3">
           <Link
             href={`/franchise/${f.slug}`}
