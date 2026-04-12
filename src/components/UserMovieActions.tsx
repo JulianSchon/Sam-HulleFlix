@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 
 interface Props {
   movieId: string
+  communityRating: number | null
+  ratingCount: number
   initial: {
     watched: boolean
     watchlist: boolean
@@ -14,7 +16,7 @@ interface Props {
   }
 }
 
-export default function UserMovieActions({ movieId, initial }: Props) {
+export default function UserMovieActions({ movieId, communityRating, ratingCount, initial }: Props) {
   const { data: session } = useSession()
   const router = useRouter()
   const [state, setState] = useState(initial)
@@ -69,7 +71,16 @@ export default function UserMovieActions({ movieId, initial }: Props) {
 
       {/* Star rating */}
       <div>
-        <p className="text-xs text-cinema-muted uppercase tracking-wider mb-2">Your Rating</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs text-cinema-muted uppercase tracking-wider">Your Rating</p>
+          {communityRating !== null && (
+            <p className="text-xs text-cinema-dim">
+              Community{' '}
+              <span className="text-cinema-gold font-bold">{communityRating.toFixed(1)}★</span>
+              <span className="text-cinema-dim"> ({ratingCount})</span>
+            </p>
+          )}
+        </div>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((n) => (
             <button

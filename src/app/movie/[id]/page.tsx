@@ -28,11 +28,25 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
     getTmdbProviders(movie.tmdbId),
   ])
 
-  const userMovie = session?.user?.id
-    ? await prisma.userMovie.findUnique({
-        where: { userId_movieId: { userId: session.user.id, movieId: movie.id } },
-      })
-    : null
+  const [userMovie, allRatings] = await Promise.all([
+    session?.user?.id
+      ? prisma.userMovie.findUnique({
+          where: { userId_movieId: { userId: session.user.id, movieId: movie.id } },
+        })
+      : Promise.resolve(null),
+    prisma.userMovie.findMany({
+      where: { movieId: movie.id, rating: { not: null } },
+      include: { user: { select: { name: true } } },
+      orderBy: { watchedAt: 'desc' },
+    }),
+  ])
+
+  const communityRating =
+    allRatings.length > 0
+      ? allRatings.reduce((sum, r) => sum + (r.rating ?? 0), 0) / allRatings.length
+      : null
+
+  const reviews = allRatings.filter((r) => r.review?.trim())
 
   const flatrate = providers.flatrate ?? []
   const rent = providers.rent ?? []
@@ -138,6 +152,8 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
           <div className="bg-cinema-surface border border-cinema-border rounded-lg p-4 mb-6">
             <UserMovieActions
               movieId={movie.id}
+              communityRating={communityRating}
+              ratingCount={allRatings.length}
               initial={{
                 watched: userMovie?.watched ?? false,
                 watchlist: userMovie?.watchlist ?? false,
@@ -180,6 +196,30 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
         <div className="mt-8">
           <h2 className="text-cinema-muted text-xs uppercase tracking-wider mb-3">Official Trailer</h2>
           <TrailerEmbed trailerKey={trailerKey} />
+        </div>
+      )}
+
+      {/* Community reviews */}
+      {reviews.length > 0 && (
+        <div className="mt-8 bg-cinema-surface border border-cinema-border rounded-lg p-5">
+          <h2 className="text-cinema-muted text-xs font-bold tracking-widest uppercase mb-4">
+            Community Reviews <span className="text-cinema-dim">({reviews.length})</span>
+          </h2>
+          <div className="space-y-4">
+            {reviews.map((r) => (
+              <div key={`${r.userId}-${r.movieId}`} className="border-l border-cinema-border pl-4">
+                <div className="flex items-center gap-3 mb-1">
+                  <span className="text-white text-sm font-bold">{r.user.name}</span>
+                  {r.rating && (
+                    <span className="text-cinema-gold text-sm">
+                      {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                    </span>
+                  )}
+                </div>
+                <p className="text-cinema-muted text-sm leading-relaxed">{r.review}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
