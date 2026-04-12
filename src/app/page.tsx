@@ -42,10 +42,10 @@ export default async function HomePage() {
                 src={featured.heroImageUrl}
                 alt={featured.name}
                 fill
-                className="object-cover opacity-20"
+                className="object-cover opacity-50"
                 unoptimized
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-black/20" />
             </div>
           )}
           <div className="relative px-8 py-10">
