@@ -51,6 +51,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
   const flatrate = providers.flatrate ?? []
   const rent = providers.rent ?? []
   const buy = providers.buy ?? []
+  const watchLink = providers.link
   const cast = tmdb?.credits?.cast?.slice(0, 10) ?? []
 
   return (
@@ -100,19 +101,19 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
               {flatrate.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Stream</p>
-                  <StreamingBadges providers={flatrate} />
+                  <StreamingBadges providers={flatrate} link={watchLink} />
                 </div>
               )}
               {rent.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Rent</p>
-                  <StreamingBadges providers={rent} />
+                  <StreamingBadges providers={rent} link={watchLink} />
                 </div>
               )}
               {buy.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Buy</p>
-                  <StreamingBadges providers={buy} />
+                  <StreamingBadges providers={buy} link={watchLink} />
                 </div>
               )}
             </div>

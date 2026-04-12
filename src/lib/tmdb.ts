@@ -58,10 +58,17 @@ export interface StreamingProvider {
   logo_path: string
 }
 
+export interface WatchProviders {
+  flatrate?: StreamingProvider[]
+  rent?: StreamingProvider[]
+  buy?: StreamingProvider[]
+  link?: string
+}
+
 export async function getTmdbProviders(
   tmdbId: number,
   country = 'SE'
-): Promise<{ flatrate?: StreamingProvider[]; rent?: StreamingProvider[]; buy?: StreamingProvider[] }> {
+): Promise<WatchProviders> {
   try {
     const res = await tmdbFetch(`/movie/${tmdbId}/watch/providers`)
     if (!res.ok) return {}
