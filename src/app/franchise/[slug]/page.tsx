@@ -119,7 +119,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
                     SIDE STORY
                   </span>
                 )}
-                <StreamingBadges providers={providers} />
+                <StreamingBadges providers={providers.slice(0, 3)} />
               </div>
             </Link>
           )

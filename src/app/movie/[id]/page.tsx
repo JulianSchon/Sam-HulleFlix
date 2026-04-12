@@ -35,6 +35,8 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
     : null
 
   const flatrate = providers.flatrate ?? []
+  const rent = providers.rent ?? []
+  const buy = providers.buy ?? []
   const cast = tmdb?.credits?.cast?.slice(0, 10) ?? []
 
   return (
@@ -78,11 +80,31 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
           </div>
 
           {/* Streaming */}
-          {flatrate.length > 0 && (
-            <div className="mb-4">
-              <p className="text-xs text-cinema-muted uppercase tracking-wider mb-2">Where to Watch</p>
-              <StreamingBadges providers={flatrate} />
+          {(flatrate.length > 0 || rent.length > 0 || buy.length > 0) && (
+            <div className="mb-4 space-y-2">
+              <p className="text-xs text-cinema-muted uppercase tracking-wider">Where to Watch</p>
+              {flatrate.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Stream</p>
+                  <StreamingBadges providers={flatrate} />
+                </div>
+              )}
+              {rent.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Rent</p>
+                  <StreamingBadges providers={rent} />
+                </div>
+              )}
+              {buy.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Buy</p>
+                  <StreamingBadges providers={buy} />
+                </div>
+              )}
             </div>
+          )}
+          {flatrate.length === 0 && rent.length === 0 && buy.length === 0 && (
+            <p className="text-cinema-dim text-xs mb-4">Not available for streaming in SE</p>
           )}
 
           {/* TMDB score */}

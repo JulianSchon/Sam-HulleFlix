@@ -6,7 +6,7 @@ export default function StreamingBadges({ providers }: { providers: StreamingPro
 
   return (
     <div className="flex gap-1 flex-wrap">
-      {providers.slice(0, 3).map((p) => (
+      {providers.map((p) => (
         <div key={p.provider_id} className="relative group flex-shrink-0">
           <div className="relative w-6 h-6 rounded overflow-hidden">
             <Image
