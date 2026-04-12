@@ -43,10 +43,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
         getTmdbMovie(movie.tmdbId),
         getTmdbProviders(movie.tmdbId),
       ])
-      const watchLink = tmdb?.title
-        ? `https://www.justwatch.com/se/search?q=${encodeURIComponent(tmdb.title)}`
-        : providers.link
-      return { movie, tmdb, providers: providers.flatrate ?? [], watchLink }
+      return { movie, tmdb, providers: providers.flatrate ?? [], fallbackLink: providers.link }
     })
   )
 
@@ -72,7 +69,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
 
       {/* Film list */}
       <div className="space-y-3 mb-10">
-        {moviesWithTmdb.map(({ movie, tmdb, providers, watchLink }, i) => {
+        {moviesWithTmdb.map(({ movie, tmdb, providers, fallbackLink }, i) => {
           const um = userMovieMap[movie.id]
           const watched = um?.watched ?? false
           const onWatchlist = um?.watchlist ?? false
@@ -128,7 +125,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
                     SIDE STORY
                   </span>
                 )}
-                <StreamingBadges providers={providers.slice(0, 3)} link={watchLink} />
+                <StreamingBadges providers={providers.slice(0, 3)} movieTitle={tmdb?.title ?? undefined} fallbackLink={fallbackLink} />
               </div>
             </Link>
           )

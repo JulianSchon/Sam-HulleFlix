@@ -51,9 +51,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
   const flatrate = providers.flatrate ?? []
   const rent = providers.rent ?? []
   const buy = providers.buy ?? []
-  const watchLink = tmdb?.title
-    ? `https://www.justwatch.com/se/search?q=${encodeURIComponent(tmdb.title)}`
-    : providers.link
+  const fallbackLink = providers.link
   const cast = tmdb?.credits?.cast?.slice(0, 10) ?? []
 
   return (
@@ -103,19 +101,19 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
               {flatrate.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Stream</p>
-                  <StreamingBadges providers={flatrate} link={watchLink} />
+                  <StreamingBadges providers={flatrate} movieTitle={tmdb?.title} fallbackLink={fallbackLink} />
                 </div>
               )}
               {rent.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Rent</p>
-                  <StreamingBadges providers={rent} link={watchLink} />
+                  <StreamingBadges providers={rent} movieTitle={tmdb?.title} fallbackLink={fallbackLink} />
                 </div>
               )}
               {buy.length > 0 && (
                 <div>
                   <p className="text-[10px] text-cinema-dim uppercase tracking-wider mb-1">Buy</p>
-                  <StreamingBadges providers={buy} link={watchLink} />
+                  <StreamingBadges providers={buy} movieTitle={tmdb?.title} fallbackLink={fallbackLink} />
                 </div>
               )}
             </div>
