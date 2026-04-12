@@ -43,7 +43,10 @@ export default async function FranchisePage({ params }: { params: { slug: string
         getTmdbMovie(movie.tmdbId),
         getTmdbProviders(movie.tmdbId),
       ])
-      return { movie, tmdb, providers: providers.flatrate ?? [], watchLink: providers.link }
+      const watchLink = tmdb?.title
+        ? `https://www.justwatch.com/se/search?q=${encodeURIComponent(tmdb.title)}`
+        : providers.link
+      return { movie, tmdb, providers: providers.flatrate ?? [], watchLink }
     })
   )
 

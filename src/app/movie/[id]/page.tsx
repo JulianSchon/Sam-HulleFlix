@@ -51,7 +51,9 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
   const flatrate = providers.flatrate ?? []
   const rent = providers.rent ?? []
   const buy = providers.buy ?? []
-  const watchLink = providers.link
+  const watchLink = tmdb?.title
+    ? `https://www.justwatch.com/se/search?q=${encodeURIComponent(tmdb.title)}`
+    : providers.link
   const cast = tmdb?.credits?.cast?.slice(0, 10) ?? []
 
   return (
