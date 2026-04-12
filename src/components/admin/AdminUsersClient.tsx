@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface User {
   id: string
@@ -13,7 +12,7 @@ interface User {
 }
 
 export default function AdminUsersClient({ users: initialUsers }: { users: User[] }) {
-  const router = useRouter()
+
   const [users, setUsers] = useState(initialUsers)
   const [inviteCodes, setInviteCodes] = useState<Record<string, string>>({})
 
@@ -64,6 +63,14 @@ export default function AdminUsersClient({ users: initialUsers }: { users: User[
       body: JSON.stringify({ role: newRole }),
     })
     setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role: newRole } : u))
+  }
+
+  async function deleteUser(userId: string, name: string) {
+    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return
+    const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+    if (res.ok) {
+      setUsers((prev) => prev.filter((u) => u.id !== userId))
+    }
   }
 
   return (
@@ -182,6 +189,12 @@ export default function AdminUsersClient({ users: initialUsers }: { users: User[
                 className="text-cinema-muted text-xs px-3 py-1.5 border border-cinema-border rounded hover:border-cinema-muted transition-colors"
               >
                 Toggle Role
+              </button>
+              <button
+                onClick={() => deleteUser(u.id, u.name)}
+                className="text-cinema-dim hover:text-cinema-red text-xs px-3 py-1.5 border border-cinema-border rounded hover:border-cinema-red/50 transition-colors"
+              >
+                Delete
               </button>
             </div>
           </div>
