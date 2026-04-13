@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -18,9 +18,15 @@ interface Franchise {
 export default function HeroCarousel({ franchises }: { franchises: Franchise[] }) {
   const [index, setIndex] = useState(0)
   const [fading, setFading] = useState(false)
+  const [paused, setPaused] = useState(false)
+  const reducedMotion = useRef(false)
 
   useEffect(() => {
-    if (franchises.length <= 1) return
+    reducedMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }, [])
+
+  useEffect(() => {
+    if (franchises.length <= 1 || paused || reducedMotion.current) return
     const timer = setInterval(() => {
       setFading(true)
       setTimeout(() => {
@@ -29,10 +35,14 @@ export default function HeroCarousel({ franchises }: { franchises: Franchise[] }
       }, 400)
     }, 5000)
     return () => clearInterval(timer)
-  }, [franchises.length])
+  }, [franchises.length, paused])
 
   function goTo(i: number) {
     if (i === index) return
+    if (reducedMotion.current) {
+      setIndex(i)
+      return
+    }
     setFading(true)
     setTimeout(() => {
       setIndex(i)
@@ -43,10 +53,14 @@ export default function HeroCarousel({ franchises }: { franchises: Franchise[] }
   const f = franchises[index]
 
   return (
-    <div className="relative rounded-xl overflow-hidden mb-10 bg-gradient-to-b from-cinema-red/10 to-cinema-bg border border-cinema-border min-h-[220px]">
+    <div
+      className="relative rounded-xl overflow-hidden mb-10 bg-gradient-to-b from-cinema-red/10 to-cinema-bg border border-cinema-border min-h-[220px]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
       {/* Background image */}
       <div
-        className="absolute inset-0 transition-opacity duration-400"
+        className="absolute inset-0 transition-opacity duration-[400ms]"
         style={{ opacity: fading ? 0 : 1 }}
       >
         {f.heroImageUrl && (
@@ -66,7 +80,7 @@ export default function HeroCarousel({ franchises }: { franchises: Franchise[] }
 
       {/* Content */}
       <div
-        className="relative px-4 py-6 md:px-8 md:py-10 transition-opacity duration-400"
+        className="relative px-4 py-6 md:px-8 md:py-10 transition-opacity duration-[400ms]"
         style={{ opacity: fading ? 0 : 1 }}
       >
         <p className="text-cinema-muted text-xs tracking-widest uppercase mb-2">Featured Franchise</p>
@@ -91,10 +105,12 @@ export default function HeroCarousel({ franchises }: { franchises: Franchise[] }
       {/* Dots */}
       {franchises.length > 1 && (
         <div className="absolute bottom-4 right-6 flex gap-1.5">
-          {franchises.map((_, i) => (
+          {franchises.map((fr, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}
+              aria-label={`Go to ${fr.name}`}
+              aria-current={i === index ? 'true' : undefined}
               className={`w-2 h-2 rounded-full transition-all ${
                 i === index ? 'bg-white scale-110' : 'bg-white/30 hover:bg-white/60'
               }`}

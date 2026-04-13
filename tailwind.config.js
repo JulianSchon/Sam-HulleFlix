@@ -10,8 +10,8 @@ module.exports = {
       colors: {
         cinema: {
           bg: '#0a0a0a',
-          surface: '#111111',
-          border: '#1a1a1a',
+          surface: '#111118',
+          border: '#1e1b30',
           red: '#e50914',
           gold: '#c8a951',
           blue: '#4a90d9',

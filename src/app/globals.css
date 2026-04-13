@@ -6,3 +6,34 @@ body {
   background-color: #0a0a0a;
   color: #e5e5e5;
 }
+
+/* Cursor */
+button,
+[role="button"],
+summary {
+  cursor: pointer;
+}
+
+/* Focus rings — visible only for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #e50914;
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Strip outline for mouse/touch users (inputs keep border highlight via Tailwind) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Reduced motion — disable transitions and animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
