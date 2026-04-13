@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -49,6 +50,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[calc(100vh-56px)] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        <BackButton />
         <div className="text-center mb-8">
           <h1 className="text-cinema-red font-black tracking-[3px] text-2xl">SAM-HULLE-FLIX</h1>
           <p className="text-cinema-muted text-sm mt-2">Create your account</p>

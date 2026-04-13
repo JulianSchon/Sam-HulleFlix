@@ -9,6 +9,7 @@ import StreamingBadges from '@/components/StreamingBadges'
 import FranchiseComments from '@/components/FranchiseComments'
 import UpdateRequestButton from '@/components/UpdateRequestButton'
 import QuickSeenButton from '@/components/QuickSeenButton'
+import BackButton from '@/components/BackButton'
 
 export default async function FranchisePage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions)
@@ -61,6 +62,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <BackButton />
       {/* Header */}
       <div className="mb-8">
         <p className="text-cinema-muted text-xs tracking-widest uppercase mb-1">Franchise</p>

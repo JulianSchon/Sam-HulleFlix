@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { getTmdbMovie, tmdbPosterUrl } from '@/lib/tmdb'
 import Image from 'next/image'
 import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
@@ -55,6 +56,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <BackButton />
       <div className="mb-8">
         <h1 className="text-white font-black text-2xl">{session.user.name}</h1>
         <p className="text-cinema-muted text-sm mt-1">{session.user.email}</p>

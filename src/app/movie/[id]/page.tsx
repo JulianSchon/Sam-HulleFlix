@@ -8,6 +8,7 @@ import Link from 'next/link'
 import TrailerEmbed from '@/components/TrailerEmbed'
 import UserMovieActions from '@/components/UserMovieActions'
 import StreamingBadges from '@/components/StreamingBadges'
+import BackButton from '@/components/BackButton'
 
 export default async function MoviePage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -56,6 +57,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      <BackButton />
       {/* Breadcrumb */}
       <div className="text-cinema-dim text-xs mb-6">
         <Link href={`/franchise/${movie.franchise.slug}`} className="hover:text-cinema-muted transition-colors">
