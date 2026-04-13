@@ -8,6 +8,7 @@ import Link from 'next/link'
 import StreamingBadges from '@/components/StreamingBadges'
 import FranchiseComments from '@/components/FranchiseComments'
 import UpdateRequestButton from '@/components/UpdateRequestButton'
+import QuickSeenButton from '@/components/QuickSeenButton'
 
 export default async function FranchisePage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions)
@@ -126,7 +127,17 @@ export default async function FranchisePage({ params }: { params: { slug: string
                 )}
               </div>
               <div className="flex flex-col items-end gap-1.5 flex-shrink-0 min-w-[60px]">
-                {watched && (
+                {session?.user?.id ? (
+                  <QuickSeenButton
+                    movieId={movie.id}
+                    initial={{
+                      watched,
+                      watchlist: onWatchlist,
+                      rating: um?.rating ?? null,
+                      review: um?.review ?? null,
+                    }}
+                  />
+                ) : watched && (
                   <span className="bg-green-950/50 border border-green-900/50 text-green-500 text-[10px] font-bold px-2 py-0.5 rounded">
                     SEEN
                   </span>
