@@ -149,7 +149,7 @@ function MovieGrid({
           </div>
           {showRating && um.rating && (
             <p className="text-cinema-gold text-[10px] mt-1 text-center">
-              {'★'.repeat(um.rating)}
+              ★ {um.rating % 1 === 0 ? um.rating : um.rating.toFixed(1)}
             </p>
           )}
         </Link>

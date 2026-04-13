@@ -113,7 +113,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
                 </p>
                 {rating && (
                   <p className="text-cinema-gold text-xs mt-0.5">
-                    {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+                    ★ {rating % 1 === 0 ? rating : rating.toFixed(1)}
                   </p>
                 )}
                 {avgRating !== null && (

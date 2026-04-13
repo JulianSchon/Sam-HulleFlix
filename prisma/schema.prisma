@@ -97,7 +97,7 @@ model UserMovie {
   movie     Movie     @relation(fields: [movieId], references: [id])
   watched   Boolean   @default(false)
   watchlist Boolean   @default(false)
-  rating    Int?
+  rating    Float?
   review    String?
   watchedAt DateTime?
 

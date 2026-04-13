@@ -213,7 +213,7 @@ export default async function MoviePage({ params }: { params: { id: string } }) 
                   <span className="text-white text-sm font-bold">{r.user.name}</span>
                   {r.rating && (
                     <span className="text-cinema-gold text-sm">
-                      {'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}
+                      ★ {r.rating % 1 === 0 ? r.rating : r.rating.toFixed(1)}
                     </span>
                   )}
                 </div>

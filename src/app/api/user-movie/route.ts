@@ -8,7 +8,7 @@ const schema = z.object({
   movieId: z.string(),
   watched: z.boolean(),
   watchlist: z.boolean(),
-  rating: z.number().int().min(1).max(5).nullable(),
+  rating: z.number().min(0.5).max(5).multipleOf(0.5).nullable(),
   review: z.string().nullable(),
 })
 

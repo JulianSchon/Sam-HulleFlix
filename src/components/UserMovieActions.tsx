@@ -21,6 +21,7 @@ export default function UserMovieActions({ movieId, communityRating, ratingCount
   const router = useRouter()
   const [state, setState] = useState(initial)
   const [saving, setSaving] = useState(false)
+  const [hoverRating, setHoverRating] = useState<number | null>(null)
 
   if (!session) {
     return (
@@ -42,6 +43,8 @@ export default function UserMovieActions({ movieId, communityRating, ratingCount
     setSaving(false)
     router.refresh()
   }
+
+  const displayRating = hoverRating ?? state.rating ?? 0
 
   return (
     <div className="space-y-4">
@@ -72,7 +75,14 @@ export default function UserMovieActions({ movieId, communityRating, ratingCount
       {/* Star rating */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs text-cinema-muted uppercase tracking-wider">Your Rating</p>
+          <p className="text-xs text-cinema-muted uppercase tracking-wider">
+            Your Rating
+            {state.rating !== null && (
+              <span className="ml-2 text-cinema-gold normal-case tracking-normal font-bold">
+                {state.rating % 1 === 0 ? state.rating : state.rating.toFixed(1)}★
+              </span>
+            )}
+          </p>
           {communityRating !== null && (
             <p className="text-xs text-cinema-dim">
               Community{' '}
@@ -81,18 +91,44 @@ export default function UserMovieActions({ movieId, communityRating, ratingCount
             </p>
           )}
         </div>
-        <div className="flex gap-1">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              onClick={() => save({ rating: state.rating === n ? null : n })}
-              className={`text-2xl transition-colors ${
-                (state.rating ?? 0) >= n ? 'text-cinema-gold' : 'text-cinema-border hover:text-cinema-dim'
-              }`}
-            >
-              ★
-            </button>
-          ))}
+
+        <div className="flex gap-0.5" onMouseLeave={() => setHoverRating(null)}>
+          {[1, 2, 3, 4, 5].map((n) => {
+            const isFull = displayRating >= n
+            const isHalf = !isFull && displayRating >= n - 0.5
+
+            return (
+              <div key={n} className="relative w-8 h-8">
+                {/* Empty star */}
+                <span className="absolute inset-0 flex items-center justify-center text-2xl text-cinema-border select-none pointer-events-none">
+                  ★
+                </span>
+                {/* Gold fill — clips to left 50% for half stars */}
+                {(isFull || isHalf) && (
+                  <span
+                    className="absolute inset-0 flex items-center justify-center text-2xl text-cinema-gold select-none pointer-events-none overflow-hidden"
+                    style={isHalf ? { clipPath: 'inset(0 50% 0 0)' } : undefined}
+                  >
+                    ★
+                  </span>
+                )}
+                {/* Left half hit area → n - 0.5 */}
+                <button
+                  className="absolute left-0 top-0 w-1/2 h-full"
+                  onMouseEnter={() => setHoverRating(n - 0.5)}
+                  onClick={() => save({ rating: state.rating === n - 0.5 ? null : n - 0.5 })}
+                  aria-label={`Rate ${n - 0.5} out of 5`}
+                />
+                {/* Right half hit area → n */}
+                <button
+                  className="absolute right-0 top-0 w-1/2 h-full"
+                  onMouseEnter={() => setHoverRating(n)}
+                  onClick={() => save({ rating: state.rating === n ? null : n })}
+                  aria-label={`Rate ${n} out of 5`}
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 
