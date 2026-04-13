@@ -48,13 +48,13 @@ export default function QuickSeenButton({ movieId, initial }: Props) {
       disabled={loading}
       aria-label={watched ? 'Mark as unseen' : 'Mark as seen'}
       title={watched ? 'Mark as unseen' : 'Mark as seen'}
-      className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 disabled:opacity-40 ${
+      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 disabled:opacity-40 ${
         watched
           ? 'bg-green-600 border-green-600 text-white'
           : 'border-cinema-dim text-transparent hover:border-green-500 hover:text-green-500'
       }`}
     >
-      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+      <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
       </svg>
     </button>
