@@ -37,13 +37,24 @@ export default async function FranchisePage({ params }: { params: { slug: string
 
   const userMovieMap = Object.fromEntries(userMovies.map((um) => [um.movieId, um]))
 
+  const movieIds = franchise.movies.map((m) => m.id)
+  const allRatings = await prisma.userMovie.findMany({
+    where: { movieId: { in: movieIds }, rating: { not: null } },
+    select: { movieId: true, rating: true },
+  })
+  const avgRatingMap: Record<string, number | null> = {}
+  for (const id of movieIds) {
+    const ratings = allRatings.filter((r) => r.movieId === id).map((r) => r.rating as number)
+    avgRatingMap[id] = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null
+  }
+
   const moviesWithTmdb = await Promise.all(
     franchise.movies.map(async (movie) => {
       const [tmdb, providers] = await Promise.all([
         getTmdbMovie(movie.tmdbId),
         getTmdbProviders(movie.tmdbId),
       ])
-      return { movie, tmdb, providers: providers.flatrate ?? [], fallbackLink: providers.link }
+      return { movie, tmdb, providers: providers.flatrate ?? [], fallbackLink: providers.link, avgRating: avgRatingMap[movie.id] }
     })
   )
 
@@ -69,7 +80,7 @@ export default async function FranchisePage({ params }: { params: { slug: string
 
       {/* Film list */}
       <div className="space-y-3 mb-10">
-        {moviesWithTmdb.map(({ movie, tmdb, providers, fallbackLink }, i) => {
+        {moviesWithTmdb.map(({ movie, tmdb, providers, fallbackLink, avgRating }, i) => {
           const um = userMovieMap[movie.id]
           const watched = um?.watched ?? false
           const onWatchlist = um?.watchlist ?? false
@@ -103,6 +114,11 @@ export default async function FranchisePage({ params }: { params: { slug: string
                 {rating && (
                   <p className="text-cinema-gold text-xs mt-0.5">
                     {'★'.repeat(rating)}{'☆'.repeat(5 - rating)}
+                  </p>
+                )}
+                {avgRating !== null && (
+                  <p className="text-cinema-dim text-xs mt-0.5">
+                    ★ {avgRating.toFixed(1)}<span className="text-[10px]">/5</span>
                   </p>
                 )}
                 {movie.watchOrderNote && (

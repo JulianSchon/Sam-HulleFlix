@@ -11,9 +11,10 @@ interface Props {
     movies: { id: string }[]
   }
   seen: number
+  avgRating: number | null
 }
 
-export default function FranchiseCard({ franchise, seen }: Props) {
+export default function FranchiseCard({ franchise, seen, avgRating }: Props) {
   const total = franchise.movies.length
   const allSeen = seen === total && total > 0
   const noneSeen = seen === 0
@@ -36,7 +37,12 @@ export default function FranchiseCard({ franchise, seen }: Props) {
         </div>
         <div className="p-3">
           <p className="text-white font-bold text-xs truncate">{franchise.name}</p>
-          <p className="text-cinema-dim text-[10px] mt-0.5">{total} films</p>
+          <div className="flex items-center justify-between mt-0.5">
+            <p className="text-cinema-dim text-[10px]">{total} films</p>
+            {avgRating !== null && (
+              <p className="text-cinema-gold text-[10px] font-medium">★ {avgRating.toFixed(1)}</p>
+            )}
+          </div>
           <p
             className={`text-[10px] mt-1.5 font-medium ${
               allSeen ? 'text-green-500' : noneSeen ? 'text-cinema-dim' : 'text-cinema-red'

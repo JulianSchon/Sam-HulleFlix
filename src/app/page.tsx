@@ -8,9 +8,28 @@ export default async function HomePage() {
   const session = await getServerSession(authOptions)
 
   const franchises = await prisma.franchise.findMany({
-    include: { movies: { select: { id: true } } },
+    include: { movies: { select: { id: true, mainStoryline: true } } },
     orderBy: [{ featured: 'desc' }, { name: 'asc' }],
   })
+
+  const mainStoryIds = franchises.flatMap((f) => f.movies.filter((m) => m.mainStoryline).map((m) => m.id))
+  const allRatings = await prisma.userMovie.findMany({
+    where: { movieId: { in: mainStoryIds }, rating: { not: null } },
+    select: { movieId: true, rating: true },
+  })
+  const ratingsByMovieId = new Map<string, number[]>()
+  for (const r of allRatings) {
+    const arr = ratingsByMovieId.get(r.movieId) ?? []
+    arr.push(r.rating as number)
+    ratingsByMovieId.set(r.movieId, arr)
+  }
+  const franchiseAvgRating: Record<string, number | null> = {}
+  for (const f of franchises) {
+    const vals = f.movies
+      .filter((m) => m.mainStoryline)
+      .flatMap((m) => ratingsByMovieId.get(m.id) ?? [])
+    franchiseAvgRating[f.id] = vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : null
+  }
 
   const seenMap: Record<string, number> = {}
 
@@ -49,7 +68,7 @@ export default async function HomePage() {
         <h2 className="text-cinema-muted text-xs tracking-widest uppercase mb-4">All Franchises</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {franchises.map((f) => (
-            <FranchiseCard key={f.id} franchise={f} seen={seenMap[f.id] ?? 0} />
+            <FranchiseCard key={f.id} franchise={f} seen={seenMap[f.id] ?? 0} avgRating={franchiseAvgRating[f.id] ?? null} />
           ))}
         </div>
       </div>
